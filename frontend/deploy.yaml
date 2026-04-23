@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-frontend
+  labels:
+    app: app1-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1-frontend
+  template:
+    metadata:
+      labels:
+        app: app1-frontend
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      nodeSelector:
+        mynode: primary
+      imagePullSecrets:
+        - name: dockerhub-secret
+      containers:
+        - name: app1-frontend
+          image: prajwal2233/app1-frontend:v1.0.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BACKEND_URL
+              value: "http://app1-backend-svc:5000"
